@@ -1,0 +1,8 @@
+/crates/cx-wasm/target/
+/crates/cx-wasm/pkg/
+/cx-jupyterlite/node_modules/
+/cx-jupyterlite/lib/
+/cx-jupyterlite/labextension/
+/cx-jupyterlite/tsconfig.tsbuildinfo
+__pycache__/
+*.py[cod]
