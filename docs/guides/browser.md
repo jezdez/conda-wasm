@@ -1,6 +1,6 @@
 # conda in the browser
 
-conda-express includes **cx-wasm**, a WebAssembly build of the same rattler-based
+conda-wasm includes **cx-wasm**, a WebAssembly build of the same rattler-based
 solver and extractor used by the native `cx` CLI. Combined with the
 `conda-emscripten` plugin, this enables real `conda install` to run entirely
 client-side in a JupyterLite notebook — no server required.
@@ -11,7 +11,7 @@ Python compiled to WASM, with cx-wasm replacing conda's native-code bottlenecks
 
 ## Try it
 
-Open the [live demo](https://jezdez.github.io/conda-express/demo/lab/index.html)
+Open the [live demo](https://jezdez.github.io/conda-wasm/demo/lab/index.html)
 and run:
 
 ```python
@@ -103,7 +103,10 @@ packages as native conda, compiled to WebAssembly. Both pure Python packages
 To build and test the JupyterLite demo locally:
 
 ```bash
-# Prerequisites: pixi, wasm-pack
+# Prerequisites: pixi
+# Install wasm-pack into the pixi Rust environment
+pixi run cargo install wasm-pack
+
 # Build the cx-wasm WASM module
 pixi run -e web wasm-build
 

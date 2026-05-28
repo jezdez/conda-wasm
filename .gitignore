@@ -1,5 +1,7 @@
 /crates/cx-wasm/target/
 /crates/cx-wasm/pkg/
+/docs/_build/
+/cx-jupyterlite/.yarn/
 /cx-jupyterlite/node_modules/
 /cx-jupyterlite/lib/
 /cx-jupyterlite/labextension/

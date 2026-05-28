@@ -1,13 +1,13 @@
 {
-  "name": "@conda-express/cx-jupyterlite",
+  "name": "@conda-wasm/cx-jupyterlite",
   "version": "0.1.0",
-  "description": "JupyterLite extension: routes %conda commands through real conda via cx-wasm",
+  "description": "JupyterLite extension: routes conda commands through real conda via cx-wasm",
   "license": "BSD-3-Clause",
-  "author": "conda-express contributors",
-  "homepage": "https://github.com/jezdez/conda-express",
+  "author": "conda-wasm contributors",
+  "homepage": "https://github.com/jezdez/conda-wasm",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jezdez/conda-express.git"
+    "url": "https://github.com/jezdez/conda-wasm.git"
   },
   "files": [
     "lib/**/*.{d.ts,js,js.map,json}",

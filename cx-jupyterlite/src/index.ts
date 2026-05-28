@@ -35,7 +35,7 @@ async function getJson(url: string) {
  * so the default kernel registration doesn't conflict.
  */
 const plugin: JupyterFrontEndPlugin<void> = {
-  id: '@conda-express/cx-jupyterlite:register',
+  id: '@conda-wasm/cx-jupyterlite:register',
   autoStart: true,
   requires: [IKernelSpecs],
   optional: [IServiceWorkerManager, IEmpackEnvMetaFile],
