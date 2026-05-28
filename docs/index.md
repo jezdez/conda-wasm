@@ -32,3 +32,10 @@ https://jezdez.github.io/conda-wasm/demo/lab/index.html
 
 guides/browser
 ```
+
+```{toctree}
+:hidden:
+:caption: Project
+
+changelog
+```

@@ -14,3 +14,6 @@ parts independently:
 The next migration step is to rename the remaining `cx-wasm` surfaces and add
 first-class project documentation following the `conda-workspaces` /
 `conda-exec` pattern.
+
+Historical browser/WASM release notes from `conda-express` now live in
+[CHANGELOG.md](CHANGELOG.md).
