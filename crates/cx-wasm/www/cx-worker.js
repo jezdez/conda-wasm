@@ -498,7 +498,7 @@ self.sync_fetch_binary = function (url) {
                 'history = PREFIX + "conda-meta/history"\n' +
                 'os.makedirs(os.path.dirname(history), exist_ok=True)\n' +
                 'with open(history, "w") as f:\n' +
-                '    f.write("==> conda-express bootstrap <==\\n")\n'
+                '    f.write("==> conda-wasm bootstrap <==\\n")\n'
             );
             log('Python environment configured', 'ok');
         } catch (e) {

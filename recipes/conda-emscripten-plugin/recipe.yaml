@@ -28,7 +28,7 @@ tests:
       pip_check: false
 
 about:
-  homepage: https://github.com/jezdez/conda-express
+  homepage: https://github.com/jezdez/conda-wasm
   license: BSD-3-Clause
   summary: >
     Emscripten-specific conda plugins: solver (resolvo via cx-wasm),

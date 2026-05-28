@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 description = "Unified WASM module for conda in the browser: bootstrap, solve, and extract"
 license = "BSD-3-Clause"
-repository = "https://github.com/jezdez/conda-express"
+repository = "https://github.com/jezdez/conda-wasm"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

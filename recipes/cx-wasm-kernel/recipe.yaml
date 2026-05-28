@@ -39,7 +39,7 @@ tests:
       pip_check: false
 
 about:
-  homepage: https://github.com/conda/conda-express
+  homepage: https://github.com/jezdez/conda-wasm
   license: BSD-3-Clause
   summary: >
     cx-wasm kernel bridge: loads the cx-wasm WebAssembly module from MEMFS
