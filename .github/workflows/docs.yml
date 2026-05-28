@@ -71,9 +71,6 @@ jobs:
 
       - name: Build conda recipes
         run: |
-          pixi run -e recipes build-conda-emscripten
-          pixi run -e recipes build-frozendict-noarch
-          pixi run -e recipes build-conda-emscripten-plugin
           pixi run -e recipes build-conda-emscripten-lockfile
           pixi run -e recipes build-cx-wasm-kernel
 
