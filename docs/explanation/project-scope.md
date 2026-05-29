@@ -67,7 +67,7 @@ browser runtime:
 - release workflows for downstream products that consume conda packages
 
 Native bootstrap binaries belong in
-{external+pronto:doc}`Pronto <index>`. The official `cx` and `cxz`
+{external+conda-pronto:doc}`conda-pronto <index>`. The official `cx` and `cxz`
 distribution policy belongs in
 {external+conda-express:doc}`conda-express <scope>`.
 
