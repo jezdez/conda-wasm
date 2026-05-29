@@ -34,6 +34,41 @@ fn is_safe_tar_path(path: &str) -> bool {
     true
 }
 
+fn normalize_tar_link_target(link_path: &str, link_target: &str) -> Option<String> {
+    if link_target.is_empty()
+        || link_target.starts_with('/')
+        || link_target.starts_with('\\')
+        || link_target.contains('\\')
+        || link_target.starts_with("C:")
+        || link_target.starts_with("c:")
+        || link_target.contains(":\\")
+    {
+        return None;
+    }
+
+    let mut components = Vec::new();
+    if let Some((parent, _)) = link_path.rsplit_once('/') {
+        for part in parent.split('/') {
+            if !part.is_empty() && part != "." {
+                components.push(part);
+            }
+        }
+    }
+
+    for part in link_target.split('/') {
+        match part {
+            "" | "." => {}
+            ".." => {
+                components.pop()?;
+            }
+            _ => components.push(part),
+        }
+    }
+
+    let normalized = components.join("/");
+    is_safe_tar_path(&normalized).then_some(normalized)
+}
+
 fn stream_tar_entries<R: Read, F>(
     tar: &mut tar::Archive<R>,
     on_file: &mut F,
@@ -88,28 +123,15 @@ where
                 .unwrap_or_default();
 
             let resolved = if entry_type == tar::EntryType::Symlink {
-                if let Some(parent) = std::path::Path::new(&path).parent() {
-                    parent
-                        .join(&link_target)
-                        .components()
-                        .fold(std::path::PathBuf::new(), |mut acc, c| {
-                            match c {
-                                std::path::Component::ParentDir => {
-                                    acc.pop();
-                                }
-                                std::path::Component::Normal(s) => acc.push(s),
-                                _ => {}
-                            }
-                            acc
-                        })
-                        .to_string_lossy()
-                        .into_owned()
-                } else {
-                    link_target.clone()
-                }
+                normalize_tar_link_target(&path, &link_target)
             } else {
-                link_target.clone()
-            };
+                normalize_tar_link_target("", &link_target)
+            }
+            .ok_or_else(|| {
+                CondaWasmError::ExtractFailed(format!(
+                    "unsafe tar link target rejected: {path} -> {link_target}"
+                ))
+            })?;
 
             deferred_links.push((path, resolved));
             continue;
@@ -148,12 +170,15 @@ where
 
     for (path, target) in deferred_links {
         if let Some(data) = file_contents.get(&target) {
-            stats.file_count += 1;
-            stats.total_size += data.len();
+            let total_size = stats.total_size + data.len();
+            if total_size as u64 > MAX_TOTAL_SIZE {
+                return Err(CondaWasmError::ExtractFailed(
+                    "extraction exceeded total size limit (2 GB)".into(),
+                ));
+            }
+            stats.total_size = total_size;
             on_file(&path, data)?;
-        } else {
             stats.file_count += 1;
-            on_file(&path, &[])?;
         }
     }
 
@@ -257,6 +282,20 @@ mod tests {
         builder.into_inner().unwrap()
     }
 
+    fn build_tar_with_link(name: &str, target: &str, entry_type: tar::EntryType) -> Vec<u8> {
+        let mut builder = tar::Builder::new(Vec::new());
+        let mut header = tar::Header::new_gnu();
+        header.set_size(0);
+        header.set_mode(0o644);
+        header.set_entry_type(entry_type);
+        header.set_link_name(target).unwrap();
+        header.set_cksum();
+        builder
+            .append_data(&mut header, name, &[] as &[u8])
+            .unwrap();
+        builder.into_inner().unwrap()
+    }
+
     fn extract_raw_tar(tar_bytes: &[u8]) -> Result<ExtractStats, CondaWasmError> {
         let mut archive = tar::Archive::new(tar_bytes);
         stream_tar_entries(&mut archive, &mut |_, _| Ok(()))
@@ -316,6 +355,17 @@ mod tests {
         assert!(!is_safe_tar_path("D:\\data"));
     }
 
+    #[test]
+    fn test_normalize_link_target_rejects_escape_above_root() {
+        assert_eq!(
+            normalize_tar_link_target("lib/link.py", "../target.py").as_deref(),
+            Some("target.py")
+        );
+        assert!(normalize_tar_link_target("link.py", "../escape.py").is_none());
+        assert!(normalize_tar_link_target("lib/link.py", "../../escape.py").is_none());
+        assert!(normalize_tar_link_target("lib/link.py", "/etc/passwd").is_none());
+    }
+
     // ── stream_tar_entries: path traversal ──
 
     fn build_tar_raw_path(raw_path: &[u8], data: &[u8]) -> Vec<u8> {
@@ -363,6 +413,23 @@ mod tests {
         assert!(result.is_err());
         let err = result.unwrap_err().to_string();
         assert!(err.contains("unsafe tar path"), "error was: {err}");
+    }
+
+    #[test]
+    fn test_tar_rejects_unsafe_symlink_target() {
+        let tar_bytes = build_tar_with_link("link.py", "../escape.py", tar::EntryType::Symlink);
+        let result = extract_raw_tar(&tar_bytes);
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(err.contains("unsafe tar link target"), "error was: {err}");
+    }
+
+    #[test]
+    fn test_tar_skips_unresolved_links() {
+        let tar_bytes = build_tar_with_link("link.py", "missing.py", tar::EntryType::Link);
+        let result = extract_raw_tar_collecting(&tar_bytes).unwrap();
+        assert_eq!(result.stats.file_count, 0);
+        assert!(result.files.is_empty());
     }
 
     // ── stream_tar_entries: dangerous entry types ──
