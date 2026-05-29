@@ -52,29 +52,70 @@ jobs:
 
   demo:
     runs-on: ubuntu-latest
+    env:
+      SCCACHE_GHA_ENABLED: "true"
+      SCCACHE_BASEDIRS: ${{ github.workspace }}
+      RUSTC_WRAPPER: sccache
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
+      - name: Restore demo build cache
+        id: demo-cache
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        continue-on-error: true
+        with:
+          path: demo/_output
+          key: demo-${{ runner.os }}-${{ hashFiles('pixi.toml', 'pixi.lock', 'demo/**', 'crates/conda-wasm/**', 'python/**', 'jupyterlite/**', 'recipes/**') }}
+
       - uses: prefix-dev/setup-pixi@1b2de7f3351f171c8b4dfeb558c639cb58ed4ec0 # v0.9.5
+        if: steps.demo-cache.outputs.cache-hit != 'true'
         with:
           environments: default web recipes demo
 
       - uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
-
-      - name: Install wasm-pack
-        run: pixi run cargo install wasm-pack
+        if: steps.demo-cache.outputs.cache-hit != 'true'
 
       - name: Build conda-wasm (WASM)
+        if: steps.demo-cache.outputs.cache-hit != 'true'
         run: pixi run -e web wasm-build
 
       - name: Build conda recipes
+        if: steps.demo-cache.outputs.cache-hit != 'true'
         run: |
           pixi run -e recipes build-conda-wasm-lockfile
 
       - name: Build JupyterLite site
+        if: steps.demo-cache.outputs.cache-hit != 'true'
         run: pixi run -e demo demo-build-local
+
+      - name: Write sccache summary
+        if: always() && steps.demo-cache.outputs.cache-hit != 'true'
+        run: |
+          if [ -n "${SCCACHE_PATH:-}" ] && [ -x "$SCCACHE_PATH" ]; then
+            SCCACHE_BIN="$SCCACHE_PATH"
+          elif command -v sccache >/dev/null 2>&1; then
+            SCCACHE_BIN="sccache"
+          else
+            echo "sccache was not available for this run." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          {
+            echo "### sccache stats"
+            echo '```'
+            "$SCCACHE_BIN" --show-stats
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Save demo build cache
+        if: steps.demo-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        continue-on-error: true
+        with:
+          path: demo/_output
+          key: ${{ steps.demo-cache.outputs.cache-primary-key }}
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

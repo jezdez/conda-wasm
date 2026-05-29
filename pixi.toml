@@ -18,10 +18,12 @@ wasm-doc = "cargo doc --manifest-path crates/conda-wasm/Cargo.toml --no-deps"
 
 [feature.web.dependencies]
 python = ">=3.12"
+rust-std-wasm32-unknown-unknown = ">=1.85"
+wasm-pack = ">=0.14"
 
 [feature.web.tasks]
-wasm-build = { cmd = "PATH=\"$HOME/.cargo/bin:$PATH\" wasm-pack build --target web --release", cwd = "crates/conda-wasm" }
-wasm-build-dev = { cmd = "PATH=\"$HOME/.cargo/bin:$PATH\" wasm-pack build --target web --dev", cwd = "crates/conda-wasm" }
+wasm-build = { cmd = "wasm-pack build --target web --release", cwd = "crates/conda-wasm" }
+wasm-build-dev = { cmd = "wasm-pack build --target web --dev", cwd = "crates/conda-wasm" }
 wasm-copy = { cmd = "cp pkg/conda_wasm.js www/conda_wasm.js && cp pkg/conda_wasm_bg.wasm www/conda_wasm_bg.wasm", cwd = "crates/conda-wasm", depends-on = ["wasm-build"] }
 wasm-copy-dev = { cmd = "cp pkg/conda_wasm.js www/conda_wasm.js && cp pkg/conda_wasm_bg.wasm www/conda_wasm_bg.wasm", cwd = "crates/conda-wasm", depends-on = ["wasm-build-dev"] }
 wasm-serve = { cmd = "python www/serve.py 8080 --directory www", cwd = "crates/conda-wasm", depends-on = ["wasm-copy"] }
