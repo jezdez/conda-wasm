@@ -84,6 +84,7 @@ def sync_fetch_binary(url: str):
     xhr.open("GET", str(url), False)
     xhr.responseType = "arraybuffer"
     xhr.send()
+    check_xhr_status(xhr, url)
     return js.Uint8Array.new(xhr.response)
 
 
@@ -94,7 +95,18 @@ def sync_fetch_text(url: str) -> str:
     xhr = js.XMLHttpRequest.new()
     xhr.open("GET", str(url), False)
     xhr.send()
+    check_xhr_status(xhr, url)
     return str(xhr.responseText)
+
+
+def check_xhr_status(xhr, url: str) -> None:
+    status = int(xhr.status)
+    if 200 <= status <= 299 or status == 304:
+        return
+    if status == 0 and (url.startswith("file:") or "://" not in url):
+        return
+    status_text = str(xhr.statusText)
+    raise RuntimeError(f"conda-wasm: HTTP {status} {status_text} while fetching {url}")
 
 
 def register_runtime_globals(conda_wasm) -> None:

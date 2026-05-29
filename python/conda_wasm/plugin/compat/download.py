@@ -42,7 +42,11 @@ def patch_download() -> None:
 def verify_checksum(url, target_full_path, data: bytes, *, md5, sha256) -> None:
     """Validate package bytes against the available conda checksum."""
     if not (sha256 or md5):
-        return
+        from conda.exceptions import CondaError
+
+        raise CondaError(
+            f"Refusing unverified download without SHA256 or MD5 metadata: {url}"
+        )
 
     checksum_type = "sha256" if sha256 else "md5"
     expected = sha256 if sha256 else md5

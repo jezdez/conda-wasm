@@ -13,6 +13,9 @@ from posixpath import normpath
 
 log = logging.getLogger(__name__)
 
+MAX_ENTRY_SIZE = 256 * 1024 * 1024
+MAX_TOTAL_SIZE = 2 * 1024 * 1024 * 1024
+
 
 def is_within(path, directory):
     """Check that *path* stays inside *directory* after resolving ``..``."""
@@ -45,9 +48,13 @@ def extract_wasm(source_path, dest_dir):
 
     try:
         extract_via_wasm(source_path, dest_dir, filename)
-    except Exception:
+    except Exception as exc:
         if filename.endswith(".tar.bz2"):
-            log.info("extractor: WASM failed for %s, using Python tarfile", filename)
+            log.info(
+                "extractor: WASM failed for %s, using Python tarfile: %s",
+                filename,
+                exc,
+            )
             extract_tar_bz2(source_path, dest_dir, filename)
         else:
             raise
@@ -102,6 +109,7 @@ def extract_tar_bz2(source_path, dest_dir, filename):
 
     os.makedirs(dest_dir, exist_ok=True)
     file_count = 0
+    total_size = 0
     file_contents: dict[str, bytes] = {}
     deferred_links: list[tuple[str, str]] = []
 
@@ -143,9 +151,21 @@ def extract_tar_bz2(source_path, dest_dir, filename):
                 parent = dirname(join(dest_dir, member.name))
                 if parent:
                     os.makedirs(parent, exist_ok=True)
+                if member.size > MAX_ENTRY_SIZE:
+                    raise RuntimeError(
+                        f"extractor: tar entry too large "
+                        f"({member.size} bytes): {member.name}"
+                    )
                 extracted = tar.extractfile(member)
                 if extracted is not None:
                     data = extracted.read()
+                    if len(data) > MAX_ENTRY_SIZE:
+                        raise RuntimeError(
+                            f"extractor: tar entry exceeded size limit: {member.name}"
+                        )
+                    total_size += len(data)
+                    if total_size > MAX_TOTAL_SIZE:
+                        raise RuntimeError("extractor: extraction exceeded total size limit")
                     with open(join(dest_dir, member.name), "wb") as out:
                         out.write(data)
                     file_contents[member.name] = data
@@ -157,6 +177,9 @@ def extract_tar_bz2(source_path, dest_dir, filename):
         if parent:
             os.makedirs(parent, exist_ok=True)
         if target in file_contents:
+            total_size += len(file_contents[target])
+            if total_size > MAX_TOTAL_SIZE:
+                raise RuntimeError("extractor: extraction exceeded total size limit")
             with open(dest_path, "wb") as out:
                 out.write(file_contents[target])
             file_count += 1
@@ -164,6 +187,15 @@ def extract_tar_bz2(source_path, dest_dir, filename):
             src_path = join(dest_dir, target)
             if os.path.isfile(src_path):
                 import shutil
+                size = os.path.getsize(src_path)
+                if size > MAX_ENTRY_SIZE:
+                    raise RuntimeError(
+                        f"extractor: linked tar entry too large ({size} bytes): {path}"
+                    )
+                total_size += size
+                if total_size > MAX_TOTAL_SIZE:
+                    raise RuntimeError("extractor: extraction exceeded total size limit")
+
                 shutil.copy2(src_path, dest_path)
                 file_count += 1
 

@@ -135,24 +135,27 @@ async fn download_and_extract_package_streaming(
         .into(),
     );
 
-    if let Some(expected) = record.package_record.sha256 {
-        use sha2::{Digest, Sha256};
-        let actual = Sha256::digest(&bytes);
-        if actual.as_slice() != expected.as_slice() {
-            let expected_hex: String = expected
-                .as_slice()
-                .iter()
-                .map(|b| format!("{b:02x}"))
-                .collect();
-            let actual_hex: String = actual
-                .as_slice()
-                .iter()
-                .map(|b| format!("{b:02x}"))
-                .collect();
-            return Err(CondaWasmError::ExtractFailed(format!(
-                "SHA256 mismatch for {name}: expected {expected_hex}, got {actual_hex}"
-            )));
-        }
+    let expected = record.package_record.sha256.ok_or_else(|| {
+        CondaWasmError::ExtractFailed(format!(
+            "missing SHA256 for {name}; refusing unverified package bytes"
+        ))
+    })?;
+    use sha2::{Digest, Sha256};
+    let actual = Sha256::digest(&bytes);
+    if actual.as_slice() != expected.as_slice() {
+        let expected_hex: String = expected
+            .as_slice()
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect();
+        let actual_hex: String = actual
+            .as_slice()
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect();
+        return Err(CondaWasmError::ExtractFailed(format!(
+            "SHA256 mismatch for {name}: expected {expected_hex}, got {actual_hex}"
+        )));
     }
 
     let js_name = JsValue::from(name.to_string());
