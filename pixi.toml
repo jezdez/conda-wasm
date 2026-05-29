@@ -13,22 +13,22 @@ sccache = ">=0.10"
 RUSTC_WRAPPER = "sccache"
 
 [tasks]
-wasm-test = "cargo test --manifest-path crates/cx-wasm/Cargo.toml"
-wasm-doc = "cargo doc --manifest-path crates/cx-wasm/Cargo.toml --no-deps"
+wasm-test = "cargo test --manifest-path crates/conda-wasm/Cargo.toml"
+wasm-doc = "cargo doc --manifest-path crates/conda-wasm/Cargo.toml --no-deps"
 
 [feature.web.dependencies]
 python = ">=3.12"
 
 [feature.web.tasks]
-wasm-build = { cmd = "PATH=\"$HOME/.cargo/bin:$PATH\" wasm-pack build --target web --release", cwd = "crates/cx-wasm" }
-wasm-build-dev = { cmd = "PATH=\"$HOME/.cargo/bin:$PATH\" wasm-pack build --target web --dev", cwd = "crates/cx-wasm" }
-wasm-copy = { cmd = "cp pkg/cx_wasm.js www/cx_wasm.js && cp pkg/cx_wasm_bg.wasm www/cx_wasm_bg.wasm", cwd = "crates/cx-wasm", depends-on = ["wasm-build"] }
-wasm-copy-dev = { cmd = "cp pkg/cx_wasm.js www/cx_wasm.js && cp pkg/cx_wasm_bg.wasm www/cx_wasm_bg.wasm", cwd = "crates/cx-wasm", depends-on = ["wasm-build-dev"] }
-wasm-serve = { cmd = "python www/serve.py 8080 --directory www", cwd = "crates/cx-wasm", depends-on = ["wasm-copy"] }
-wasm-serve-dev = { cmd = "python www/serve.py 8080 --directory www", cwd = "crates/cx-wasm", depends-on = ["wasm-copy-dev"] }
-wasm-conda-test-prep = { cmd = "test -f ../../recipes/conda-emscripten/lockfile-env/pixi.lock || (echo 'Run pixi run -e recipes build-conda-emscripten-lockfile first' >&2; exit 1); cp ../../recipes/conda-emscripten/lockfile-env/pixi.lock www/conda-emscripten.lock && mkdir -p www/packages && cp ../../output/noarch/conda-*.conda ../../output/noarch/frozendict-*.conda ../../output/noarch/conda-emscripten-*.conda www/packages/ 2>/dev/null; true", cwd = "crates/cx-wasm", depends-on = ["wasm-copy-dev"] }
-wasm-conda-test = { cmd = "echo 'Open http://localhost:8080/conda-test.html' && python www/serve.py 8080 --directory www", cwd = "crates/cx-wasm", depends-on = ["wasm-conda-test-prep"] }
-wasm-clean = { cmd = "cargo clean && rm -rf pkg www/cx_wasm.js www/cx_wasm_bg.wasm", cwd = "crates/cx-wasm" }
+wasm-build = { cmd = "PATH=\"$HOME/.cargo/bin:$PATH\" wasm-pack build --target web --release", cwd = "crates/conda-wasm" }
+wasm-build-dev = { cmd = "PATH=\"$HOME/.cargo/bin:$PATH\" wasm-pack build --target web --dev", cwd = "crates/conda-wasm" }
+wasm-copy = { cmd = "cp pkg/conda_wasm.js www/conda_wasm.js && cp pkg/conda_wasm_bg.wasm www/conda_wasm_bg.wasm", cwd = "crates/conda-wasm", depends-on = ["wasm-build"] }
+wasm-copy-dev = { cmd = "cp pkg/conda_wasm.js www/conda_wasm.js && cp pkg/conda_wasm_bg.wasm www/conda_wasm_bg.wasm", cwd = "crates/conda-wasm", depends-on = ["wasm-build-dev"] }
+wasm-serve = { cmd = "python www/serve.py 8080 --directory www", cwd = "crates/conda-wasm", depends-on = ["wasm-copy"] }
+wasm-serve-dev = { cmd = "python www/serve.py 8080 --directory www", cwd = "crates/conda-wasm", depends-on = ["wasm-copy-dev"] }
+conda-wasm-test-prep = { cmd = "test -f ../../recipes/conda/lockfile-env/pixi.lock || (echo 'Run pixi run -e recipes build-conda-wasm-lockfile first' >&2; exit 1); cp ../../recipes/conda/lockfile-env/pixi.lock www/conda-wasm.lock && mkdir -p www/packages && cp ../../output/noarch/conda-*.conda ../../output/noarch/frozendict-*.conda ../../output/noarch/conda-wasm-*.conda www/packages/ 2>/dev/null; true", cwd = "crates/conda-wasm", depends-on = ["wasm-copy-dev"] }
+conda-wasm-test = { cmd = "echo 'Open http://localhost:8080/conda-test.html' && python www/serve.py 8080 --directory www", cwd = "crates/conda-wasm", depends-on = ["conda-wasm-test-prep"] }
+wasm-clean = { cmd = "cargo clean && rm -rf pkg www/conda_wasm.js www/conda_wasm_bg.wasm", cwd = "crates/conda-wasm" }
 
 [feature.docs.dependencies]
 sphinx = ">=7.0"
@@ -48,13 +48,12 @@ docs-clean = { cmd = "rm -rf _build", cwd = "docs" }
 rattler-build = ">=0.35"
 
 [feature.recipes.tasks]
-build-conda-emscripten = { cmd = "rattler-build build --recipe recipes/conda-emscripten/recipe.yaml -c conda-forge" }
+build-conda = { cmd = "rattler-build build --recipe recipes/conda/recipe.yaml -c conda-forge" }
 build-frozendict-noarch = { cmd = "rattler-build build --recipe recipes/frozendict-noarch/recipe.yaml -c conda-forge" }
-build-conda-emscripten-plugin = { cmd = "rattler-build build --recipe recipes/conda-emscripten-plugin/recipe.yaml -c conda-forge" }
-build-conda-emscripten-lockfile = { cmd = "pixi install", cwd = "recipes/conda-emscripten/lockfile-env", depends-on = ["build-conda-emscripten", "build-frozendict-noarch", "build-conda-emscripten-plugin"] }
-build-cx-wasm-kernel = { cmd = "rattler-build build --recipe recipes/cx-wasm-kernel/recipe.yaml -c conda-forge" }
+build-conda-wasm = { cmd = "test -f crates/conda-wasm/pkg/conda_wasm.js || (echo 'Run pixi run -e web wasm-build first' >&2; exit 1); rattler-build build --recipe recipes/conda-wasm/recipe.yaml -c conda-forge" }
+build-conda-wasm-lockfile = { cmd = "pixi install", cwd = "recipes/conda/lockfile-env", depends-on = ["build-conda", "build-frozendict-noarch", "build-conda-wasm"] }
 
-[feature.lite.dependencies]
+[feature.demo.dependencies]
 python = ">=3.12"
 jupyterlite-core = ">=0.5"
 jupyterlite-xeus = ">=4.0"
@@ -62,15 +61,15 @@ jupyterlab = ">=4.0,<5"
 micromamba = ">=2.0"
 nodejs = ">=20"
 
-[feature.lite.tasks]
-lite-build = { cmd = "python build.py", cwd = "lite" }
-lite-build-local = { cmd = "python build.py --with-local", cwd = "lite" }
-lite-serve = { cmd = "echo 'Open http://localhost:8888/lab/index.html' && python -m http.server 8888 --directory _output", cwd = "lite" }
-lite-demo = { depends-on = ["lite-build-local", "lite-serve"] }
-lite-clean = { cmd = "rm -rf _output _env .jupyterlite.doit.db", cwd = "lite" }
+[feature.demo.tasks]
+demo-build = { cmd = "python build.py", cwd = "demo" }
+demo-build-local = { cmd = "python build.py --with-local", cwd = "demo" }
+demo-serve = { cmd = "echo 'Open http://localhost:8888/lab/index.html' && python -m http.server 8888 --directory _output", cwd = "demo" }
+demo = { depends-on = ["demo-build-local", "demo-serve"] }
+demo-clean = { cmd = "rm -rf _output _env .jupyterlite.doit.db", cwd = "demo" }
 
 [environments]
 docs = ["docs"]
 web = ["web"]
 recipes = ["recipes"]
-lite = ["lite"]
+demo = ["demo"]

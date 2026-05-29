@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "conda-wasm"
+version = "0.1.0"
+description = "Browser runtime and conda plugins for WebAssembly conda environments"
+license = "BSD-3-Clause"
+requires-python = ">=3.12"
+dependencies = ["conda>=25.1"]
+
+[project.entry-points.conda]
+conda-wasm = "conda_wasm.plugin"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["conda_wasm*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"conda_wasm" = ["runtime_assets/*.js", "runtime_assets/*.wasm"]

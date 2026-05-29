@@ -1,0 +1,10 @@
+{
+  "LiteBuildConfig": {
+    "output_dir": "_output",
+    "contents": ["files"],
+    "federated_extensions": ["../jupyterlite/labextension"]
+  },
+  "XeusAddon": {
+    "empack_config": "empack_config.yaml"
+  }
+}
