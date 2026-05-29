@@ -1,0 +1,59 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: cargo
+    directory: /crates/conda-wasm
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+      semver-major-days: 21
+    groups:
+      rust:
+        patterns:
+          - "*"
+
+  - package-ecosystem: pip
+    directory: /python
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+      semver-major-days: 21
+    groups:
+      python:
+        patterns:
+          - "*"
+
+  - package-ecosystem: npm
+    directory: /jupyterlite
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+      semver-major-days: 21
+    groups:
+      jupyterlite:
+        patterns:
+          - "*"
+
+  - package-ecosystem: conda
+    directory: /demo
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      demo-environment:
+        patterns:
+          - "*"
