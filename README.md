@@ -6,14 +6,8 @@ This repository owns the browser-specific conda stack: WebAssembly solver and
 extraction support, Emscripten conda integration, the Python browser runtime,
 JupyterLite integration, demo notebooks, and recipes for packaging that stack.
 
-It is intentionally separate from the native bootstrap projects:
-
-- [`pronto`](https://github.com/jezdez/pronto) builds generic native conda
-  bootstrap binaries.
-- [`conda-express`](https://github.com/jezdez/conda-express) publishes the
-  opinionated `cx` and `cxz` native distribution built with Pronto.
-- `conda-wasm` is for conda in the browser: Emscripten, WebAssembly,
-  JupyterLite, MEMFS, and browser package handling.
+The repository is focused on conda in the browser: Emscripten, WebAssembly,
+JupyterLite, MEMFS, and browser package handling.
 
 Repository areas:
 
@@ -31,7 +25,6 @@ Documentation is organized by goal:
 - How-to guides: use notebook magics and build the local demo
 - Reference: repository layout, Python runtime package layout, browser runtime,
   and conda plugin behavior
-- Explanation: architecture and project boundaries with Pronto and
-  conda-express
+- Explanation: architecture and development scope
 
 Historical browser/WASM release notes now live in [CHANGELOG.md](CHANGELOG.md).

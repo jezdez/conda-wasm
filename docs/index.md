@@ -7,12 +7,9 @@ Browser and WebAssembly tooling for conda.
 Emscripten Python runtime, using WebAssembly where native conda depends on
 capabilities that are unavailable or too slow in the browser.
 
-It is intentionally scoped to browser and WebAssembly work: the Rust WASM
-module, the Python runtime package, conda plugin hooks, IPython magics,
-JupyterLite integration, demo site, and recipes for Emscripten-hosted conda.
-Native single-binary bootstrap distributions are handled elsewhere: `pronto`
-builds generic native bootstrap binaries, and `conda-express` publishes the
-opinionated `cx` and `cxz` distribution built with Pronto.
+It includes the Rust WASM module, Python runtime package, conda plugin hooks,
+IPython magics, JupyterLite integration, demo site, and recipes needed for
+Emscripten-hosted conda.
 
 ## Start Here
 
@@ -26,8 +23,8 @@ Use these docs by goal.
 :link-type: doc
 :class-card: sd-shadow-sm sd-card-hover
 
-Open the live JupyterLite demo, load `conda_wasm`, install a package, and see
-where the browser runtime fits.
+Open the live JupyterLite demo, load `conda_wasm`, and install a package in a
+browser kernel.
 :::
 
 :::{grid-item-card} Use conda in a notebook
@@ -122,36 +119,6 @@ the JupyterLite demo under `/demo/`:
 
 Open the live JupyterLite demo
 ```
-
-## Repository Boundaries
-
-::::{grid} 1 1 3 3
-:gutter: 3
-
-:::{grid-item-card} conda-wasm
-:class-card: sd-shadow-sm
-{bdg-primary}`browser`
-^^^
-Browser conda, WebAssembly, Emscripten recipes, JupyterLite integration, and
-runtime package behavior.
-:::
-
-:::{grid-item-card} pronto
-:class-card: sd-shadow-sm
-{bdg-secondary}`native builder`
-^^^
-Generic native bootstrap binary construction and artifact layouts.
-:::
-
-:::{grid-item-card} conda-express
-:class-card: sd-shadow-sm
-{bdg-info}`cx distribution`
-^^^
-The opinionated native `cx` and `cxz` product distribution built with Pronto.
-:::
-::::
-
-Read {doc}`explanation/project-scope` when deciding where a change belongs.
 
 ```{toctree}
 :caption: Tutorials

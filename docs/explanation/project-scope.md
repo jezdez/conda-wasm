@@ -1,36 +1,41 @@
-# Project Scope
+# Development Scope
 
-`conda-wasm` owns the browser and WebAssembly conda stack.
+Use this page when deciding whether a change belongs in this repository.
 
-It is not the native conda bootstrap builder, and it is not the `cx` product
-distribution. Those responsibilities belong to `pronto` and `conda-express`.
+`conda-wasm` is focused on making conda work inside browser-hosted Python
+environments. That scope includes the runtime pieces, packaging recipes,
+JupyterLite integration, and documentation needed to build, test, and explain
+that workflow.
 
 ::::{grid} 1 1 3 3
 :gutter: 3
 
-:::{grid-item-card} conda-wasm
+:::{grid-item-card} Browser runtime
 :class-card: sd-shadow-sm
-{bdg-primary}`browser runtime`
+{bdg-primary}`runtime`
 ^^^
-Browser, WebAssembly, Emscripten, JupyterLite, and browser package handling.
+Runtime setup, plugin hooks, `%conda` magics, browser filesystem behavior, and
+shared-library loading.
 :::
 
-:::{grid-item-card} pronto
+:::{grid-item-card} WebAssembly
 :class-card: sd-shadow-sm
-{bdg-secondary}`native builder`
+{bdg-secondary}`wasm`
 ^^^
-Generic native builder/runtime for ready-to-run conda bootstrap binaries.
+Solver, extractor, sharded repodata helpers, and generated WASM assets used by
+the Python runtime.
 :::
 
-:::{grid-item-card} conda-express
+:::{grid-item-card} Demo stack
 :class-card: sd-shadow-sm
-{bdg-info}`product distribution`
+{bdg-info}`jupyterlite`
 ^^^
-Opinionated native conda distribution that publishes `cx` and `cxz`.
+JupyterLite extension, demo notebooks, local demo build, docs, and
+Emscripten-compatible recipes.
 :::
 ::::
 
-## What conda-wasm Owns
+## In Scope
 
 This repository owns browser-specific conda infrastructure:
 
@@ -49,50 +54,21 @@ The repository should be explicit about browser constraints: MEMFS, no native
 subprocess support, synchronous XHR requirements in the worker path, Emscripten
 platform tags, and package availability from Emscripten-compatible channels.
 
-## What Pronto Owns
+## Out of Scope
 
-Pronto owns generic native bootstrap binary construction:
+Keep these concerns out of this repository unless they directly affect the
+browser runtime:
 
-- deriving a runtime lock from conda or Pixi project metadata
-- downloading package archives into native bundle layouts
-- compiling the generic native runtime template
-- producing `none`, `external`, and `embedded` artifact layouts
-- writing artifact metadata and checksums
-- exposing local builder and GitHub Action workflows
+- native desktop or server bootstrap binaries
+- installer, launcher, and product-distribution packaging for native platforms
+- package selection policy for native user distributions
+- generic conda behavior that is not changed by browser or Emscripten
+  constraints
+- release workflows for downstream products that consume conda packages
 
-Pronto does not own JupyterLite, Emscripten conda patches, browser filesystem
-behavior, or WebAssembly package extraction. It may consume conda package
-metadata, but it targets native bootstrap binaries, not browser kernels.
-
-## What conda-express Owns
-
-`conda-express` owns the downstream `cx` and `cxz` distribution:
-
-- binary names and user-facing product identity
-- default native package set
-- release channels and installer wrappers
-- Homebrew, Docker, PyPI, crates.io, and GitHub Release packaging
-- `cx` / `cxz` documentation and release policy
-
-`conda-express` calls Pronto to build native binaries. It should not carry
-browser-specific code, WebAssembly crates, JupyterLite extension code, or
-Emscripten recipes.
-
-## What Moved Here
-
-Browser/WASM work that previously lived near `conda-express` now belongs in
-`conda-wasm`:
-
-- the Rust WASM solver and extractor crate
-- Emscripten conda patches and recipes
-- JupyterLite extension and static demo site
-- Python runtime loader and packaged WASM assets
-- `%conda` / `%conda_wasm` notebook workflow
-- browser-specific conda plugin behavior
-
-This split keeps each repository honest: `conda-wasm` explains browser conda,
-Pronto explains native bootstrap construction, and `conda-express` explains the
-official `cx` product.
+It is fine for docs or comments to mention an external project when that helps
+explain a concrete migration or compatibility issue. Avoid using this repository
+to explain external ownership as part of the normal user journey.
 
 ## Contributor Routing
 
@@ -101,17 +77,19 @@ Use this rule of thumb:
 ::::{grid} 1 1 3 3
 :gutter: 3
 
-:::{grid-item-card} Put it in conda-wasm
-Conda inside JupyterLite, Emscripten, browser fetch, MEMFS, WASM solving, WASM
-extraction, or Emscripten recipes.
+:::{grid-item-card} Keep it here
+The change touches JupyterLite, Emscripten, browser fetch, MEMFS, WASM solving,
+WASM extraction, `%conda` in a browser kernel, or Emscripten recipes.
 :::
 
-:::{grid-item-card} Put it in Pronto
-Generic native bootstrap binary generation or artifact layouts.
+:::{grid-item-card} Coordinate elsewhere
+The change is about native installers, native artifact layouts, desktop/server
+launchers, or downstream product defaults.
 :::
 
-:::{grid-item-card} Put it in conda-express
-Official `cx` package choices, installation methods, Docker images, Homebrew
-formulae, release workflows, or user-facing product defaults.
+:::{grid-item-card} Document the constraint
+If a browser-specific workaround looks surprising, explain the browser,
+Emscripten, or conda plugin constraint next to the implementation or in the
+nearest reference page.
 :::
 ::::
