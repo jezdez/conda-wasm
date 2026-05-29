@@ -66,6 +66,11 @@ browser runtime:
   constraints
 - release workflows for downstream products that consume conda packages
 
+Native bootstrap binaries belong in
+{external+pronto:doc}`Pronto <index>`. The official `cx` and `cxz`
+distribution policy belongs in
+{external+conda-express:doc}`conda-express <scope>`.
+
 It is fine for docs or comments to mention an external project when that helps
 explain a concrete migration or compatibility issue. Avoid using this repository
 to explain external ownership as part of the normal user journey.
