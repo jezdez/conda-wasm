@@ -5,11 +5,30 @@
 It is not the native conda bootstrap builder, and it is not the `cx` product
 distribution. Those responsibilities belong to `pronto` and `conda-express`.
 
-| Project | Role |
-|---|---|
-| `conda-wasm` | Browser, WebAssembly, Emscripten, JupyterLite, and browser package handling |
-| `pronto` | Generic native builder/runtime for ready-to-run conda bootstrap binaries |
-| `conda-express` | Opinionated native conda distribution that publishes `cx` and `cxz` |
+::::{grid} 1 1 3 3
+:gutter: 3
+
+:::{grid-item-card} conda-wasm
+:class-card: sd-shadow-sm
+{bdg-primary}`browser runtime`
+^^^
+Browser, WebAssembly, Emscripten, JupyterLite, and browser package handling.
+:::
+
+:::{grid-item-card} pronto
+:class-card: sd-shadow-sm
+{bdg-secondary}`native builder`
+^^^
+Generic native builder/runtime for ready-to-run conda bootstrap binaries.
+:::
+
+:::{grid-item-card} conda-express
+:class-card: sd-shadow-sm
+{bdg-info}`product distribution`
+^^^
+Opinionated native conda distribution that publishes `cx` and `cxz`.
+:::
+::::
 
 ## What conda-wasm Owns
 
@@ -79,10 +98,20 @@ official `cx` product.
 
 Use this rule of thumb:
 
-- If a change is about conda inside JupyterLite, Emscripten, browser fetch,
-  MEMFS, WASM solving, WASM extraction, or Emscripten recipes, it belongs here.
-- If a change is about generic native bootstrap binary generation or artifact
-  layouts, it belongs in Pronto.
-- If a change is about official `cx` package choices, installation methods,
-  Docker images, Homebrew formulae, release workflows, or user-facing product
-  defaults, it belongs in `conda-express`.
+::::{grid} 1 1 3 3
+:gutter: 3
+
+:::{grid-item-card} Put it in conda-wasm
+Conda inside JupyterLite, Emscripten, browser fetch, MEMFS, WASM solving, WASM
+extraction, or Emscripten recipes.
+:::
+
+:::{grid-item-card} Put it in Pronto
+Generic native bootstrap binary generation or artifact layouts.
+:::
+
+:::{grid-item-card} Put it in conda-express
+Official `cx` package choices, installation methods, Docker images, Homebrew
+formulae, release workflows, or user-facing product defaults.
+:::
+::::

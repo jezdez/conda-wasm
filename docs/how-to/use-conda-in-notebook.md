@@ -3,6 +3,25 @@
 Use this guide when you already have a JupyterLite or xeus-python browser
 environment that includes `conda-wasm` and patched conda.
 
+::::{grid} 1 1 3 3
+:gutter: 3
+
+:::{grid-item-card} Register once
+:class-card: sd-shadow-sm
+Load `conda_wasm` in the notebook session before running conda commands.
+:::
+
+:::{grid-item-card} Use `%conda`
+:class-card: sd-shadow-sm
+Run normal conda commands through the notebook magic, not a shell process.
+:::
+
+:::{grid-item-card} Expect MEMFS
+:class-card: sd-shadow-sm
+Installs are session-local unless the host application adds persistence.
+:::
+::::
+
 ## Register the Magics
 
 Load the extension in a notebook:
@@ -14,13 +33,28 @@ Load the extension in a notebook:
 This registers `%conda` and `%conda_wasm`. Both call into
 `conda_wasm.magic`.
 
-Use `%conda` for normal work:
+Use `%conda` for normal work.
 
+::::{tab-set}
+
+:::{tab-item} Install
 ```python
 %conda install zlib
+```
+:::
+
+:::{tab-item} List
+```python
 %conda list
+```
+:::
+
+:::{tab-item} Info
+```python
 %conda info
 ```
+:::
+::::
 
 Use `%conda_wasm` when a notebook should make the browser-specific execution
 path explicit:
@@ -44,6 +78,12 @@ loads them with `ctypes.CDLL(..., mode=ctypes.RTLD_GLOBAL)`. That step is what
 allows newly installed C extension packages to be imported immediately in the
 same kernel session.
 
+```{dropdown} Commands that mutate the environment
+The magic treats `install`, `update`, `remove`, and `create` as mutating
+commands. Those commands also trigger shared-library scanning after conda
+returns.
+```
+
 ## Wait for Runtime Setup
 
 The runtime starts loading when `conda_wasm.runtime` is imported in an
@@ -61,6 +101,11 @@ startup explicitly, you can call:
 import conda_wasm.runtime as runtime
 
 await runtime.setup()
+```
+
+```{note}
+Native Python imports are intentionally safe. `runtime.setup()` only performs
+browser setup when the process is running under Emscripten.
 ```
 
 ## Enable Timing Output
@@ -90,3 +135,9 @@ hosting application adds a persistent filesystem layer.
 
 For reproducible demos, keep important packages in the prebuilt JupyterLite
 environment and use runtime `%conda install` for interactive examples.
+
+```{seealso}
+{doc}`../reference/browser-runtime` documents runtime setup and sharded
+repodata prefetching. {doc}`../reference/conda-plugin` documents the solver,
+extractor, pre-command patch, and virtual package hooks.
+```

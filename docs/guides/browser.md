@@ -2,12 +2,37 @@
 
 This page is the older combined guide. The docs are now split by purpose:
 
-- Start with {doc}`../tutorials/try-browser-demo` for a guided first run.
-- Use {doc}`../how-to/use-conda-in-notebook` for notebook commands and runtime
-  behavior.
-- Use {doc}`../how-to/build-local-demo` to build the demo from source.
-- Read {doc}`../reference/browser-runtime` for the runtime details.
-- Read {doc}`../explanation/architecture` for the full execution model.
+::::{grid} 1 1 2 2
+:gutter: 3
+
+:::{grid-item-card} First run
+:link: ../tutorials/try-browser-demo
+:link-type: doc
+:class-card: sd-shadow-sm sd-card-hover
+Guided walkthrough of the live browser demo.
+:::
+
+:::{grid-item-card} Notebook commands
+:link: ../how-to/use-conda-in-notebook
+:link-type: doc
+:class-card: sd-shadow-sm sd-card-hover
+Practical `%conda` usage and runtime behavior.
+:::
+
+:::{grid-item-card} Local build
+:link: ../how-to/build-local-demo
+:link-type: doc
+:class-card: sd-shadow-sm sd-card-hover
+Build the demo from this checkout.
+:::
+
+:::{grid-item-card} Architecture
+:link: ../explanation/architecture
+:link-type: doc
+:class-card: sd-shadow-sm sd-card-hover
+Execution model and component boundaries.
+:::
+::::
 
 ## Short Version
 

@@ -7,6 +7,29 @@ The result is not a new package manager. It is real conda, running in Python
 compiled to WebAssembly, with browser-specific solver, extractor, fetch, and
 filesystem integration.
 
+::::{grid} 1 1 2 4
+:gutter: 3
+
+:::{grid-item-card} Conda stays in charge
+Command semantics, transactions, prefix records, and CLI behavior remain conda
+behavior.
+:::
+
+:::{grid-item-card} WASM replaces native gaps
+Solving, extraction, and shard decoding move to browser-safe WebAssembly paths.
+:::
+
+:::{grid-item-card} Runtime joins the layers
+Python, JavaScript, pyjs, and Rust communicate through registered browser call
+points.
+:::
+
+:::{grid-item-card} MEMFS shapes persistence
+Installed files live in the browser filesystem unless the host adds persistent
+storage.
+:::
+::::
+
 ## Execution Model
 
 ```
@@ -27,6 +50,14 @@ Browser tab
 
 The JupyterLite extension improves notebook ergonomics. The Python package is
 what makes conda work in the kernel.
+
+```{dropdown} Read the tree from top to bottom
+The browser tab hosts JupyterLite on the main thread. The Python kernel runs in
+a WebWorker. Inside that worker, `conda_wasm.runtime` initializes the generated
+WASM module, `conda_wasm.magic` turns notebook commands into conda calls, and
+`conda_wasm.plugin` replaces browser-incompatible conda internals at plugin
+boundaries.
+```
 
 ## Startup
 
@@ -51,18 +82,34 @@ When a user runs:
 
 the flow is:
 
-1. `conda_wasm.magic.command` parses the line and injects `--yes` for mutating
-   commands when needed.
-2. `conda_wasm.magic.prefix` creates minimal prefix metadata and a browser
-   `.condarc` on first use.
-3. `conda_wasm.plugin.patches` applies Emscripten compatibility patches.
-4. The magic calls `conda.cli.main.main`.
-5. Conda resolves through `CondaWasmSolver`, which calls the Rust WASM solver
-   through the JS runtime.
-6. Conda downloads packages through a MEMFS-safe download patch.
-7. Package extraction goes through the WASM extractor.
-8. After a mutating command, conda-wasm scans for new `.so` files and loads
-   them so imports work in the same kernel session.
+::::{grid} 1 1 2 2
+:gutter: 2
+
+:::{grid-item-card} 1. Magic dispatch
+`conda_wasm.magic.command` parses the line and injects `--yes` for mutating
+commands when needed.
+:::
+
+:::{grid-item-card} 2. Prefix bootstrap
+`conda_wasm.magic.prefix` creates minimal prefix metadata and a browser
+`.condarc` on first use.
+:::
+
+:::{grid-item-card} 3. Patch and call conda
+`conda_wasm.plugin.patches` applies compatibility patches, then the magic calls
+`conda.cli.main.main`.
+:::
+
+:::{grid-item-card} 4. Solve and extract
+Conda resolves through `CondaWasmSolver`, downloads through a MEMFS-safe patch,
+and extracts through the WASM extractor.
+:::
+
+:::{grid-item-card} 5. Load new shared libraries
+After a mutating command, conda-wasm scans for new `.so` files and loads them
+so imports work in the same kernel session.
+:::
+::::
 
 Conda still owns command semantics, transaction planning, link actions, prefix
 records, package cache records, and user-facing CLI behavior.
@@ -94,8 +141,26 @@ channels.
 
 ## Limits
 
-- MEMFS is volatile unless the host application adds persistence.
-- Post-link subprocesses are skipped.
-- Symlink and hardlink behavior is constrained by the browser filesystem.
-- Browser security rules govern network access.
-- The supported platform is `emscripten-wasm32`.
+::::{grid} 1 1 2 3
+:gutter: 2
+
+:::{grid-item-card} Volatile filesystem
+MEMFS is volatile unless the host application adds persistence.
+:::
+
+:::{grid-item-card} No post-link subprocesses
+Post-link subprocesses are skipped.
+:::
+
+:::{grid-item-card} Browser filesystem rules
+Symlink and hardlink behavior is constrained by the browser filesystem.
+:::
+
+:::{grid-item-card} Browser network rules
+Browser security rules govern network access.
+:::
+
+:::{grid-item-card} Emscripten platform
+The supported platform is `emscripten-wasm32`.
+:::
+::::

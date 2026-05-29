@@ -1,1 +1,26 @@
 /* conda-wasm custom styles */
+
+.sd-card {
+  border-radius: 0.4rem;
+}
+
+.sd-card .sd-card-title {
+  font-weight: 650;
+}
+
+.conda-component-card {
+  border-left: 0.25rem solid var(--pst-color-primary);
+}
+
+.conda-component-card .sd-card-body > p:first-child {
+  margin-bottom: 0.75rem;
+}
+
+.bd-main .sd-tab-set {
+  margin-bottom: 1.25rem;
+}
+
+.bd-main .sd-card-text,
+.bd-main .sd-card-body {
+  line-height: 1.55;
+}

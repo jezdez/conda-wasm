@@ -2,6 +2,54 @@
 
 This repository contains all browser and WebAssembly-specific conda work.
 
+```{note}
+Generated docs and demo output are rebuildable. Source files live in `docs/`,
+`demo/`, `jupyterlite/`, `python/`, `crates/`, and `recipes/`; build products
+stay out of version control unless a release workflow publishes them.
+```
+
+::::{grid} 1 1 2 3
+:gutter: 3
+
+:::{grid-item-card} Rust
+`crates/conda-wasm/`
+^^^
+WebAssembly solver, extractor, sharded repodata helpers, and browser gateway
+code.
+:::
+
+:::{grid-item-card} Python
+`python/conda_wasm/`
+^^^
+Runtime setup, plugin hooks, magic commands, compatibility patches, and
+packaged assets.
+:::
+
+:::{grid-item-card} Frontend
+`jupyterlite/`
+^^^
+JupyterLite extension source and generated extension packaging.
+:::
+
+:::{grid-item-card} Demo
+`demo/`
+^^^
+JupyterLite configuration, notebooks, empack config, and local build script.
+:::
+
+:::{grid-item-card} Recipes
+`recipes/`
+^^^
+Patched conda recipe, conda-wasm package recipe, and support recipes.
+:::
+
+:::{grid-item-card} Docs
+`docs/`
+^^^
+Sphinx documentation source organized with a Diataxis-style split.
+:::
+::::
+
 | Path | Purpose |
 |---|---|
 | `crates/conda-wasm/` | Rust crate compiled to WebAssembly |
@@ -43,6 +91,22 @@ Generated `wasm-pack` output goes under `crates/conda-wasm/pkg/`.
 
 `conda_wasm.runtime`, `conda_wasm.magic`, and `conda_wasm.plugin.patches` are
 the stable import surfaces for users and integrations.
+
+::::{grid} 1 1 3 3
+:gutter: 3
+
+:::{grid-item-card} `conda_wasm.runtime`
+Public browser runtime setup API.
+:::
+
+:::{grid-item-card} `conda_wasm.magic`
+IPython extension and `%conda` command dispatch API.
+:::
+
+:::{grid-item-card} `conda_wasm.plugin.patches`
+Compatibility patch coordination API.
+:::
+::::
 
 ## JupyterLite Extension
 

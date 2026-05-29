@@ -7,10 +7,35 @@ This package is the browser runtime and conda plugin layer for
 Emscripten-hosted Python. It is not the whole project, and it is not useful as a
 standalone replacement for conda. The full browser stack also needs:
 
-- the Rust WebAssembly artifacts from `crates/conda-wasm/pkg/`
-- patched conda from `recipes/conda/`
-- an Emscripten Python runtime such as xeus-python in JupyterLite
-- Emscripten-compatible package channels
+::::{grid} 1 1 2 2
+:gutter: 3
+
+:::{grid-item-card} Rust artifacts
+`crates/conda-wasm/pkg/`
+^^^
+Generated `wasm-pack` output copied into the Python package at recipe build
+time.
+:::
+
+:::{grid-item-card} Patched conda
+`recipes/conda/`
+^^^
+Conda with Emscripten-oriented patches for browser filesystem and platform
+constraints.
+:::
+
+:::{grid-item-card} Browser Python runtime
+JupyterLite / xeus-python
+^^^
+Python compiled for Emscripten, usually running in a WebWorker.
+:::
+
+:::{grid-item-card} Compatible channels
+`emscripten-wasm32` packages
+^^^
+Channels that provide browser-compatible packages for the target platform.
+:::
+::::
 
 The `recipes/conda-wasm/` recipe copies `conda_wasm.js` and
 `conda_wasm_bg.wasm` into `conda_wasm/runtime_assets/` before packaging. In the
@@ -57,6 +82,13 @@ The runtime package contains:
 The runtime auto-schedules setup when imported under `sys.platform ==
 "emscripten"`. Native imports are safe and do not try to load browser APIs.
 
+```{dropdown} Runtime setup lifecycle
+`runtime.setup()` is async because it has to read packaged assets, create
+browser `Blob` URLs, dynamically import the generated ES module, initialize
+wasm-bindgen, register JS globals, and prefetch sharded repodata. The module
+keeps state in `runtime.state` so repeated setup calls share the same task.
+```
+
 ## `conda_wasm.magic`
 
 `conda_wasm.magic` owns magic registration and command dispatch. It is used by
@@ -86,6 +118,12 @@ The magic package contains:
 The magic calls `conda.cli.main.main` directly. It does not shell out to a
 `conda` executable.
 
+```{tip}
+User notebooks normally interact with the top-level extension:
+`%load_ext conda_wasm`. Direct imports from `conda_wasm.magic` are mainly for
+integration and testing code.
+```
+
 ## `conda_wasm.plugin`
 
 `conda_wasm.plugin` is the conda plugin entry point declared in
@@ -98,12 +136,26 @@ conda-wasm = "conda_wasm.plugin"
 
 When conda loads the plugin, it registers:
 
-- `conda_solvers`: exposes `CondaWasmSolver` as `conda-wasm`
-- `conda_package_extractors`: exposes the WASM extractor in Emscripten
-- `conda_pre_commands`: applies browser compatibility patches before mutating
-  commands
-- `conda_virtual_packages`: exposes `__unix` and `__emscripten` virtual package
-  records for Emscripten subdirs
+::::{grid} 1 1 2 2
+:gutter: 3
+
+:::{grid-item-card} `conda_solvers`
+Exposes `CondaWasmSolver` as `conda-wasm`.
+:::
+
+:::{grid-item-card} `conda_package_extractors`
+Exposes the WASM extractor in Emscripten.
+:::
+
+:::{grid-item-card} `conda_pre_commands`
+Applies browser compatibility patches before mutating commands.
+:::
+
+:::{grid-item-card} `conda_virtual_packages`
+Exposes `__unix` and `__emscripten` virtual package records for Emscripten
+subdirs.
+:::
+::::
 
 The plugin package keeps imports lazy where native smoke tests or conda startup
 would otherwise import browser-only or heavy runtime code too early.
