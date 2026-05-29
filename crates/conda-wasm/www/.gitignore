@@ -1,8 +1,8 @@
 # wasm-pack build output
-cx_wasm.js
-cx_wasm.d.ts
-cx_wasm_bg.wasm
-cx_wasm_bg.wasm.d.ts
+conda_wasm.js
+conda_wasm.d.ts
+conda_wasm_bg.wasm
+conda_wasm_bg.wasm.d.ts
 package.json
 
 # pyjs runtime (copied during build)

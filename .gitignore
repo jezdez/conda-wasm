@@ -1,4 +1,5 @@
 .DS_Store
+/.pixi/
 /output/
 /crates/conda-wasm/target/
 /crates/conda-wasm/pkg/
@@ -11,3 +12,8 @@
 /recipes/conda/lockfile-env/pixi.lock
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
