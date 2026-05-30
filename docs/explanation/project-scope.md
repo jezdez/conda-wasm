@@ -67,9 +67,9 @@ browser runtime:
 - release workflows for downstream products that consume conda packages
 
 Native bootstrap binaries belong in
-{external+conda-pronto:doc}`conda-pronto <index>`. The official `cx` and `cxz`
-distribution policy belongs in
-{external+conda-express:doc}`conda-express <scope>`.
+{external+conda-pronto:doc}`conda-pronto <index>`. Product-specific native
+distribution policy belongs in the downstream distribution that publishes those
+native artifacts.
 
 It is fine for docs or comments to mention an external project when that helps
 explain a concrete migration or compatibility issue. Avoid using this repository
