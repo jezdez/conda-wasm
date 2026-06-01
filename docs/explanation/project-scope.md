@@ -67,7 +67,7 @@ browser runtime:
 - release workflows for downstream products that consume conda packages
 
 Native bootstrap binaries belong in
-{external+conda-pronto:doc}`conda-pronto <index>`. Product-specific native
+{external+conda-ship:doc}`conda-ship <index>`. Product-specific native
 distribution policy belongs in the downstream distribution that publishes those
 native artifacts.
 

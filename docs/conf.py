@@ -50,7 +50,7 @@ html_css_files = ["css/custom.css"]
 html_baseurl = "https://jezdez.github.io/conda-wasm/"
 
 intersphinx_mapping = {
-    "conda-pronto": ("https://jezdez.github.io/conda-pronto/", None),
+    "conda-ship": ("https://jezdez.github.io/conda-ship/", None),
 }
 
 exclude_patterns = ["_build"]
