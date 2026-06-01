@@ -45,7 +45,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: prefix-dev/setup-pixi@1b2de7f3351f171c8b4dfeb558c639cb58ed4ec0 # v0.9.5
+      - uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
         with:
           environments: docs
       - name: Build docs
@@ -76,7 +76,7 @@ jobs:
           path: demo/_output
           key: demo-${{ runner.os }}-${{ hashFiles('pixi.toml', 'pixi.lock', 'demo/**', 'crates/conda-wasm/**', 'python/**', 'jupyterlite/**', 'recipes/**') }}
 
-      - uses: prefix-dev/setup-pixi@1b2de7f3351f171c8b4dfeb558c639cb58ed4ec0 # v0.9.5
+      - uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
         if: steps.demo-cache.outputs.cache-hit != 'true'
         with:
           environments: default web recipes demo
